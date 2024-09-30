@@ -1,0 +1,4 @@
+fileignoreconfig:
+- filename: s3_trigger_lambda
+  checksum: 7c329a5042f0655cb118fdfb3da7b067294fb6b8d1abf956232d351287b98b99
+version: "1.0"

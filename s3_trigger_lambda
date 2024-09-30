@@ -1,0 +1,43 @@
+import json
+import requests
+
+# Slack webhook URL
+SLACK_WEBHOOK_URL = ""
+
+def lambda_handler(event, context):
+    # Loop through each S3 event record
+    for record in event['Records']:
+        bucket = record['s3']['bucket']['name']
+        key = record['s3']['object']['key']
+        
+        # Extract the file/folder name from the key (file path)
+        file_name = key.split('/')[-1]  # Get the last part of the path
+
+        # Create a detailed message for Slack
+        message = f"A new object has been uploaded to S3 bucket '{bucket}':\n" \
+                  f"File/Folder Name: {file_name}\n" \
+                  f"Full Path: {key}"
+
+        # Send the message to Slack
+        send_slack_message(message)
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Notification sent to Slack')
+    }
+
+def send_slack_message(message):
+    # Send a message to Slack using the incoming webhook
+    slack_message = {
+        'text': message
+    }
+    
+    # Make the request to the Slack webhook
+    response = requests.post(
+        SLACK_WEBHOOK_URL,
+        json=slack_message,
+        headers={'Content-Type': 'application/json'}
+    )
+    
+    if response.status_code != 200:
+        raise ValueError(f"Request to Slack returned an error {response.status_code}, the response is:\n{response.text}")
